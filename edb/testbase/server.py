@@ -1151,6 +1151,12 @@ class DatabaseTestCase(ClusterTestCase, ConnectedTestCaseMixin):
         if cls.INTERNAL_TESTMODE:
             script += '\nCONFIGURE SESSION SET __internal_testmode := true;'
 
+        if getattr(cls, 'BACKEND_SUPERUSER', False):
+            has_create_db = getattr(cls, 'has_create_database', True)
+            has_create_role = getattr(cls, 'has_create_role', True)
+            if not has_create_db or not has_create_role:
+                raise unittest.SkipTest('skipped due to lack of superuser')
+
         schema = []
         # Incude the extensions before adding schemas.
         for ext in cls.EXTENSIONS:
